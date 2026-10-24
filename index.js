@@ -1,6 +1,6 @@
 /* @preserve
  * LC Debug user script
- * <nowiki>  <= Don't remove this.
+ * <nowiki> <= Don't remove this.
  * @license CC BY-SA 4.0 and MIT
  * @source https://github.com/zauberviolino/lc-debug
  * @model Claude Sonnet 5.5 Medium

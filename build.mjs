@@ -3,7 +3,7 @@ import { minifyTemplates, writeFiles } from "esbuild-minify-templates";
 
 esbuild.build({
   entryPoints: ["index.js"], // 改成你的源文件路径
-  outfile: "min.js", // 压缩后的输出路径
+  outfile: "dist/min.js", // 压缩后的输出路径
   bundle: true,
   minify: true, // 启用JS压缩
   sourcemap: true,

@@ -1,6 +1,6 @@
 /* @preserve
  * LC Debug user script
- * <nowiki> <= Don't remove this.
+ * <nowiki> <=  Don't remove this.
  * @license CC BY-SA 4.0 and MIT
  * @source https://github.com/zauberviolino/lc-debug
  * @model Claude Sonnet 5.5 Medium
@@ -481,7 +481,6 @@ const FALLBACK_CHAINS = {
 };
 const LAYER_RANK = { core: 1, local: 2, cgroup: 3, manual: 4, inline: 4 }; // inline：行内 -{zh-xx:a}-，只用于显示/配色，不进规则表
 const LAYER_LABEL = { core: _M('layer.core'), local: _M('layer.siteTable'), cgroup: _M('layer.convGroup'), manual: _M('layer.pageManual'), inline: _M('layer.inlineManual') };
-/*! minify-templates-ignore */
 const ph = n => `\x01_LC_PH_${n}_\x01`;
 
 // ───────────────────────── M1：屏蔽 ─────────────────────────
@@ -493,7 +492,6 @@ const ANYTAG_RE = /^<\/?[a-zA-Z][^>]*>/;
 // <ref …> / <ref … />：M1 不再把内容整段屏蔽，而是产生“开/合”标记，渲染器负责折叠
 const REF_OPEN_RE = /^<ref\b([^>]*?)(\/?)>/i;
 /** 结构标记（标题/ref 的开合）也走占位符通道：以 \ x02 开头，tokenize 时还原成结构 token */
-/*! minify-templates-ignore */
 const mark = o => '\x02' + JSON.stringify(o);
 function refLabel(attrs) {
   const parts = [];
@@ -975,7 +973,6 @@ function removeManualRules(P, dyn) {
 }
 function* manualBlock(block, body, dyn, holds, meta) {
   // 先在“屏蔽后”的文本上切分规则（; 不会被代码里的分号干扰），再把占位符还原成原文
-  /*! minify-templates-ignore */
   const back = x => holds ? x.replace(/\x01_LC_PH_(\d+)_\x01/g, (m, n) => holds[+n] != null ? holds[+n] : m) : x;
   const P = parseManual(body);
   const fix = o => { const r = {}; for (const k of Object.keys(o)) r[k] = back(o[k]); return r; };
@@ -1157,7 +1154,6 @@ function* tokenize(escapedText, placeholders, tables, groups, rules, map, info) 
       u.to[SHORT[v]] = m.to;
     }
   }
-  /*! minify-templates-ignore */
   const re = /\x01_LC_PH_(\d+)_\x01|-\{([\s\S]*?)\}-/g;
   function* run(text, off) {
     const perV = {};
@@ -2064,7 +2060,6 @@ function ensureTables(status) {
 // ── 公共转换组：按文中的 {{noteTA|G1=…}} 现取现用 ──
 // 两个位置：先 Module:CGroup/X；没有的话退到 Template:CGroup/X —— 展开模板，得到一大堆 -{H|…}-
 async function expandCGroupTemplate(name) {
-  /*! minify-templates-ignore */
   if (/[{}|<>\[\]#\x00-\x1f]/.test(name)) return null; // 不是能放进 {{ }} 的名字
   try {
     const r = await new mw.Api().post({ action: 'expandtemplates', text: '{{CGroup/' + name + '}}', prop: 'wikitext', formatversion: 2 });
@@ -3176,7 +3171,6 @@ async function compareVariants(oldSrc, newSrc, onVariant, cancelled, onStatus) {
   const rawParse = (text, v) => apiCall('post', { action: 'parse', title: cfg('wgPageName'), text, contentmodel: 'wikitext', prop: 'text', disablelimitreport: 1, disableeditsection: 1, disabletoc: 1, preview: 1, variant: v, uselang: 'zh', formatversion: 2 })
     .then(r => { if (!r.parse || typeof r.parse.text !== 'string') throw new Error(_M('compare.noHtml')); return r.parse.text; });
   const parse = async (text, v, what) => {
-    /*! minify-templates-ignore */
     const key = v + '\x00' + text, hit = PARSE_CACHE.get(key);
     if (hit && Date.now() - hit.t < 600000) return hit.html;
     const html = await withRetry(() => rawParse(text, v), cancelled, t => onStatus && onStatus(v, t), what);
@@ -3268,7 +3262,6 @@ async function quickCheck(src, spec, cancelled, onStatus) {
     for (const u of info.usage) {
       if (u.s < preLen) continue;
       const c = candOf(u, info.defs); if (!c) continue;
-      /*! minify-templates-ignore */
       const id = c.label + '\x00' + u.from; let h = found.get(id);
       if (!h) found.set(id, h = { label: c.label, key: u.from, n: 0, ctx: [] });
       h.n++; if (h.ctx.length < 2) h.ctx.push({ a: tidy(text.slice(Math.max(preLen, u.s - 30), u.s)).slice(-18), k: text.slice(u.s, u.e), b: tidy(text.slice(u.e, u.e + 30)).slice(0, 18) });
@@ -3348,7 +3341,6 @@ function rmDetailEl(spec, res) {
     for (const h of r.hunks) {
       const o = r.A.slice(h.a0, h.a1), n = r.B.slice(h.b0, h.b1);
       const ot = o.map(x => x.text).join(' '), nt = n.map(x => x.text).join(' ');
-      /*! minify-templates-ignore */
       const path = domPath((o[0] || n[0]).node), k = ot + '\x00' + nt + '\x00' + path;
       let g = agg.get(k); if (!g) agg.set(k, g = { ot, nt, path, vs: [] });
       g.vs.push(disp(SHORT[v]));
@@ -3932,9 +3924,7 @@ const clip = (x, n) => { x = x.replace(/\s+/g, ' ').trim(); return x.length > n 
 /** 一个块的签名：文本节点取文字；元素取 outerHTML + 其中所有 tooltip 的内容（规则来源变了也算差异） */
 function blockSig(n) {
   if (n.nodeType === 3) return 'T' + n.data;
-  /*! minify-templates-ignore */
   const tips = [n, ...n.querySelectorAll('[data-lc-tip]')].filter(x => x._lcTip).map(x => x._lcTip.map(l => l.text + '\x02' + (l.page || '')).join('\n'));
-  /*! minify-templates-ignore */
   return 'E' + n.outerHTML + (tips.length ? '\x00' + tips.join('\x01') : '');
 }
 /** 两个签名数组的差异区间 [{a0,a1,b0,b1}]（半开区间，下标相对完整数组）。先剥公共前后缀，中间用 LCS；太大就不细分 */

@@ -1,7 +1,7 @@
-name: Minify on Push
+name: Minify on Push (rvt2)
 on:
   push:
-    branches: [main]
+    branches: [rvt2]
     paths: ['index.js', 'build.mjs']
 
 permissions:

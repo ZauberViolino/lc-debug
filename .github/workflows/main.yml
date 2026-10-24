@@ -2,7 +2,7 @@ name: Minify on Push
 on:
   push:
     branches: [main]
-    paths: ['index.js', 'build.mjs', 'package.json']
+    paths: ['index.js', 'build.mjs']
 
 permissions:
   contents: write
@@ -12,18 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      # 可选：确保 Node 版本一致。不写这一步，直接用预装的 Node 也可以。
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'npm'
-      
-      - run: npm ci
-      
-      # 这一步完全在云端运行，你本地不需要有 Node
+
+      # 直接在云端装依赖，不需要 package.json
+      - run: npm install --no-save esbuild esbuild-minify-templates
+
       - run: node build.mjs
-      
+
       - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
@@ -34,3 +28,4 @@ jobs:
           else
             git commit -m "chore: auto-minify [skip ci]"
             git push
+          fi

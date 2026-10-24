@@ -16,7 +16,7 @@ jobs:
       # 可选：确保 Node 版本一致。不写这一步，直接用预装的 Node 也可以。
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
       
       - run: npm ci
